@@ -1,0 +1,43 @@
+{% extends 'news/base.html' %}
+
+{% block title %}{{ news.title }} - INFO_KAZ{% endblock %}
+
+{% block content %}
+<article class="card">
+    <div class="card-body">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'news:index' %}" class="text-decoration-none">Главная</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'news:category_detail' category_slug=news.category.slug %}" class="text-decoration-none">{{ news.category.name }}</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ news.title }}</li>
+            </ol>
+        </nav>
+
+        <header class="mb-4">
+            <h1 class="card-title display-5 fw-bold">{{ news.title }}</h1>
+            <div class="d-flex align-items-center text-muted mb-3">
+                <i class="bi bi-folder me-2"></i>
+                <span class="me-3">{{ news.category.name }}</span>
+                <i class="bi bi-clock me-2"></i>
+                <span>{{ news.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+        </header>
+
+        {% if news.image %}
+        <figure class="mb-4">
+            <img src="{{ news.image.url }}" class="img-fluid rounded" alt="{{ news.title }}" style="max-height: 500px; width: 100%; object-fit: cover;">
+        </figure>
+        {% endif %}
+
+        <div class="news-content">
+            {{ news.content|safe }}
+        </div>
+
+        <div class="mt-4 pt-4 border-top">
+            <a href="{% url 'news:category_detail' category_slug=news.category.slug %}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Вернуться к списку новостей
+            </a>
+        </div>
+    </div>
+</article>
+{% endblock %} 

@@ -1,0 +1,76 @@
+{% extends 'news/base.html' %}
+
+{% block title %}INFO_KAZ - Главная{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h2 class="mb-0">Последние новости</h2>
+            </div>
+            <div class="card-body">
+                {% if news_list %}
+                    {% for news in news_list %}
+                        <article class="card mb-4">
+                            <div class="row g-0">
+                                {% if news.image %}
+                                    <div class="col-md-4 card-img-top-container">
+                                        <a href="{% url 'news:news_detail' news.slug %}">
+                                            <img src="{{ news.image.url }}" class="img-fluid rounded-start" alt="{{ news.title }}">
+                                        </a>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h3 class="card-title h5">
+                                                <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
+                                                    {{ news.title }}
+                                                </a>
+                                            </h3>
+                                            <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
+                                            <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="bi bi-folder me-2"></i>
+                                                <span class="me-3">{{ news.category.name }}</span>
+                                                <i class="bi bi-clock me-2"></i>
+                                                <small>{{ news.created_at|date:"d.m.Y H:i" }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="col-12">
+                                        <div class="card-body">
+                                            <h3 class="card-title h5">
+                                                <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
+                                                    {{ news.title }}
+                                                </a>
+                                            </h3>
+                                            <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
+                                            <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
+                                            <div class="d-flex align-items-center text-muted">
+                                                <i class="bi bi-folder me-2"></i>
+                                                <span class="me-3">{{ news.category.name }}</span>
+                                                <i class="bi bi-clock me-2"></i>
+                                                <small>{{ news.created_at|date:"d.m.Y H:i" }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        {% if search_query %}
+                            По вашему запросу "{{ search_query }}" ничего не найдено.
+                        {% else %}
+                            На данный момент новостей нет.
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
