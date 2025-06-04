@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-clo((7pbi=65e%3rl_+2rf)c2a_$=h25=w=dodgpoz8tc=^1yp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['info-kaz.kz', '68.183.215.5']
+ALLOWED_HOSTS = ['info-kaz.kz', '104.248.224.97']
 
 
 # Application definition
