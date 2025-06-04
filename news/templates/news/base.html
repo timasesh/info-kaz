@@ -60,15 +60,25 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="footer-title">INFO_KAZ</div>
-                    <p>© 2025 info-kaz.kz</p>
-                    <p>Свидетельство о регистрации СМИ №KZ21-12345 от 01.06.2025 г.</p>
+                    <div class="footer-title" style="font-size: {{ footer_content.site_name_font_size }};">{{ footer_content.site_name }}</div>
+                    <p style="font-size: {{ footer_content.copyright_text_font_size }};">{{ footer_content.copyright_text }}</p>
+                    <p style="font-size: {{ footer_content.registration_info_font_size }};">{{ footer_content.registration_info }}</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     {# <p>Учредитель: ТОО «ИнформСервис», ИНН: 123456789012</p> #}
-                    <p>Главный редактор: Иванов И.И.</p>
+                    <p style="font-size: {{ footer_content.editor_info_font_size }};">{{ footer_content.editor_info }}</p>
                 </div>
             </div>
+            {% comment %}
+            Отображение дополнительных полей футера
+            {% endcomment %}
+            {% for key, value in footer_content.extra_fields.items %}
+                <div class="row">
+                    <div class="col-12 text-md-end">
+                        <p style="font-size: {{ value.font_size }};"><strong>{{ key }}:</strong> {{ value.text }}</p>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </footer>
 

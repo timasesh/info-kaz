@@ -10,8 +10,8 @@ from django.contrib.auth import login as auth_login
 from django.conf import settings
 from django import forms
 from django.contrib import messages
-from django.core.paginator import Paginator
-from .models import Category, News, Contact
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import Category, News, Contact, FooterContent
 from .forms import ContactForm, NewsAdminForm, CategoryAdminForm
 
 def get_client_ip(request):
@@ -24,6 +24,18 @@ def get_client_ip(request):
 
 def get_categories():
     return Category.objects.all()
+
+def get_footer_content(request):
+    footer_content = FooterContent.objects.first()
+    if not footer_content:
+        # Create default footer content if none exists
+        footer_content = FooterContent.objects.create(
+            site_name='INFO_KAZ',
+            copyright_text='© 2025 info-kaz.kz',
+            registration_info='Свидетельство о регистрации СМИ №KZ21-12345 от 01.06.2025 г.',
+            editor_info='Главный редактор: Иванов И.И.'
+        )
+    return {'footer_content': footer_content}
 
 def index(request):
     search_query = request.GET.get('search', '')
@@ -410,4 +422,74 @@ def admin_news_of_the_day(request):
         'current_news_of_the_day': current_news_of_the_day,
         'categories': Category.objects.all(), # Для навигации админки
     }
-    return render(request, 'news/admin/news_of_the_day.html', context) 
+    return render(request, 'news/admin/news_of_the_day.html', context)
+
+@staff_member_required
+def admin_footer_edit(request):
+    footer_content = FooterContent.objects.first()
+    if not footer_content:
+        footer_content = FooterContent.objects.create(
+            site_name='INFO_KAZ',
+            site_name_font_size='1.2rem',
+            copyright_text='© 2025 info-kaz.kz',
+            copyright_text_font_size='0.9rem',
+            registration_info='Свидетельство о регистрации СМИ №KZ21-12345 от 01.06.2025 г.',
+            registration_info_font_size='0.9rem',
+            editor_info='Главный редактор: Иванов И.И.',
+            editor_info_font_size='0.9rem',
+            extra_fields={}
+        )
+
+    if request.method == 'POST':
+        footer_content.site_name = request.POST.get('site_name')
+        footer_content.site_name_font_size = f"{request.POST.get('site_name_font_size', '1.2')}rem"
+        footer_content.copyright_text = request.POST.get('copyright_text')
+        footer_content.copyright_text_font_size = f"{request.POST.get('copyright_text_font_size', '0.9')}rem"
+        footer_content.registration_info = request.POST.get('registration_info')
+        footer_content.registration_info_font_size = f"{request.POST.get('registration_info_font_size', '0.9')}rem"
+        footer_content.editor_info = request.POST.get('editor_info')
+        footer_content.editor_info_font_size = f"{request.POST.get('editor_info_font_size', '0.9')}rem"
+
+        # Обработка дополнительных полей (теперь включает размер шрифта)
+        extra_fields_data = {}
+        for key, value in request.POST.items():
+            if key.startswith('extra_field_key_'):
+                index = key.replace('extra_field_key_', '')
+                field_key = value # Ключ дополнительного поля
+                field_value = request.POST.get(f'extra_field_value_{index}', '') # Значение
+                field_font_size = f"{request.POST.get(f'extra_field_font_size_{index}', '0.9')}rem" # Размер шрифта
+                if field_key:
+                     extra_fields_data[field_key] = {'text': field_value, 'font_size': field_font_size}
+
+        footer_content.extra_fields = extra_fields_data
+
+        footer_content.save()
+        messages.success(request, 'Футер успешно обновлен')
+        return redirect('news:admin_footer_edit')
+
+    # Determine whether to show optional fields
+    show_registration_info_input = bool(footer_content.registration_info) or (request.method == 'POST' and request.POST.get('registration_info') is not None)
+    show_editor_info_input = bool(footer_content.editor_info) or (request.method == 'POST' and request.POST.get('editor_info') is not None)
+
+    # Convert font sizes from 'rem' to numbers for the form
+    def strip_rem(value):
+        return value.replace('rem', '') if value else '0.9'
+
+    # Prepare font sizes for display in the form
+    font_sizes_display = {
+        'site_name_font_size': strip_rem(footer_content.site_name_font_size),
+        'copyright_text_font_size': strip_rem(footer_content.copyright_text_font_size),
+        'registration_info_font_size': strip_rem(footer_content.registration_info_font_size),
+        'editor_info_font_size': strip_rem(footer_content.editor_info_font_size),
+    }
+
+    context = {
+        'footer_content': footer_content,
+        'categories': Category.objects.all(),
+        # Передача дополнительных полей в удобном формате для шаблона
+        'extra_fields_list': [(key, value['text'], strip_rem(value.get('font_size', '0.9rem'))) for key, value in footer_content.extra_fields.items()], # Use .get with default for safety
+        'show_registration_info_input': show_registration_info_input,
+        'show_editor_info_input': show_editor_info_input,
+        'font_sizes_display': font_sizes_display, # Pass numeric font sizes for display
+    }
+    return render(request, 'news/admin/footer_edit.html', context) 

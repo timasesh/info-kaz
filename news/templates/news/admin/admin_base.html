@@ -139,6 +139,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link {% if request.resolver_match.url_name == 'admin_footer_edit' %}active{% endif %}" 
+                                   href="{% url 'news:admin_footer_edit' %}">
+                                    <i class="bi bi-pencil-square me-2"></i> Редактировать футер
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link" href="{% url 'news:index' %}" target="_blank">
                                     <i class="bi bi-box-arrow-up-right me-2"></i> Перейти на сайт
                                 </a>

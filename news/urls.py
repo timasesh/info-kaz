@@ -26,11 +26,14 @@ urlpatterns = [
     path(f'{ADMIN_URL_PREFIX}categories/<slug:category_slug>/edit/', views.admin_category_update, name='admin_category_update'),
     path(f'{ADMIN_URL_PREFIX}categories/<slug:category_slug>/delete/', views.admin_category_delete, name='admin_category_delete'),
 
-    # Contact message management
+    # Custom Admin URLs for Contact
     path(f'{ADMIN_URL_PREFIX}contacts/', views.admin_contact_list, name='admin_contact_list'),
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/', views.admin_contact_detail, name='admin_contact_detail'),
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/delete/', views.admin_contact_delete, name='admin_contact_delete'),
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/mark-read/', views.admin_contact_mark_read, name='admin_contact_mark_read'),
+
+    # Custom Admin URL for Footer
+    path(f'{ADMIN_URL_PREFIX}footer/', views.admin_footer_edit, name='admin_footer_edit'),
 
     # Public URLs
     path('', views.index, name='index'),

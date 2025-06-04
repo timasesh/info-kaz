@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-clo((7pbi=65e%3rl_+2rf)c2a_$=h25=w=dodgpoz8tc=^1yp'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-clo((7pbi=65e%3rl_+2rf)c2a_$=h25=w=dodgpoz8tc=^1yp')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['info-kaz.kz', '104.248.224.97']
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') + ['localhost', '127.0.0.1', '.onrender.com']
 
 
 # Application definition
@@ -40,11 +42,14 @@ INSTALLED_APPS = [
     'news.apps.NewsConfig',
     'django_summernote',
     'django.contrib.sites',
-    'django.contrib.flatpages'
+    'django.contrib.flatpages',
+    'whitenoise.runserver_nostatic',
+    'whitenoise',
 ]
 SITE_ID = 1
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -67,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'news.views.get_footer_content',
             ],
         },
     },
@@ -81,13 +87,15 @@ WSGI_APPLICATION = 'news_portal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'kaz_info',
-        'USER': 'kaz_info_user',
-        'PASSWORD': 'your_secure_password',
+        'NAME': 'mysite',
+        'USER': 'mysite',
+        'PASSWORD': 'password',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '',
     }
 }
+
+DATABASES['default'] = dj_database_url.config(conn_max_age=600)
 
 
 # Password validation
@@ -138,6 +146,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Static files collection root
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Whitenoise configuration for static files
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 LOGIN_URL = 'news:admin_login'
 
@@ -145,9 +155,11 @@ LOGIN_URL = 'news:admin_login'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
-X_FRAME_OPTIONS = 'DENY'
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+# You might keep these as False unless you have a specific reason to enable them.
+# SECURE_BROWSER_XSS_FILTER = False
+# SECURE_CONTENT_TYPE_NOSNIFF = False
 
 # Consider using environment variables for sensitive settings like SECRET_KEY
 # For example, using python-decouple:

@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Category, News, Contact
+from django.utils.html import format_html
+from .models import Category, News, Contact, FooterContent
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -23,4 +24,42 @@ class ContactAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('name', 'email', 'subject', 'message', 'created_at')}),
         ('Статус и ответ', {'fields': ('status', 'admin_response', 'response_date')}),
-    ) 
+    )
+
+@admin.register(FooterContent)
+class FooterContentAdmin(admin.ModelAdmin):
+    def has_add_permission(self, request):
+        # Only allow one instance
+        if self.model.objects.count() >= 1:
+            return False
+        return super().has_add_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        # Prevent deletion of the only instance
+        return False
+
+    def preview_footer(self, obj):
+        return format_html(
+            '<div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">'
+            '<h3 style="margin-bottom: 10px;">{}</h3>'
+            '<p>{}</p>'
+            '<p>{}</p>'
+            '<p style="text-align: right;">{}</p>'
+            '</div>',
+            obj.site_name,
+            obj.copyright_text,
+            obj.registration_info,
+            obj.editor_info
+        )
+    preview_footer.short_description = 'Предпросмотр футера'
+
+    fieldsets = (
+        ('Предпросмотр', {
+            'fields': ('preview_footer',),
+            'classes': ('collapse',),
+        }),
+        ('Редактирование содержимого', {
+            'fields': ('site_name', 'copyright_text', 'registration_info', 'editor_info'),
+        }),
+    )
+    readonly_fields = ('preview_footer', 'updated_at') 

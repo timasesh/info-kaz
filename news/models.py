@@ -1,6 +1,12 @@
 from django.db import models
 from django.utils.text import slugify
 from django.db.models import Max
+from django.urls import reverse
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.utils.html import strip_tags
+from django.utils.translation import gettext_lazy as _
+from django.db.models.fields.json import JSONField
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name='Название категории')
@@ -96,4 +102,34 @@ class Contact(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.name} - {self.subject}" 
+        return f"{self.name} - {self.subject}"
+
+class FooterContent(models.Model):
+    site_name = models.CharField(_('Название сайта'), max_length=100)
+    site_name_font_size = models.CharField(_('Размер шрифта Названия сайта'), max_length=20, default='1.2rem', help_text=_('Например: 16px, 1.2em, 1.5rem'))
+    copyright_text = models.CharField(_('Текст копирайта'), max_length=200)
+    copyright_text_font_size = models.CharField(_('Размер шрифта Текста копирайта'), max_length=20, default='0.9rem', help_text=_('Например: 14px, 0.9em, 0.8rem'))
+    registration_info = models.CharField(_('Информация о регистрации'), max_length=200, blank=True, null=True)
+    registration_info_font_size = models.CharField(_('Размер шрифта Информации о регистрации'), max_length=20, default='0.9rem', blank=True, help_text=_('Например: 14px, 0.9em, 0.8rem'))
+    editor_info = models.CharField(_('Информация о редакторе'), max_length=200, blank=True, null=True)
+    editor_info_font_size = models.CharField(_('Размер шрифта Информации о редакторе'), max_length=20, default='0.9rem', blank=True, help_text=_('Например: 14px, 0.9em, 0.8rem'))
+    extra_fields = JSONField(_('Дополнительные поля (текст и размер шрифта)'), default=dict, blank=True)
+    updated_at = models.DateTimeField(_('Последнее обновление'), auto_now=True)
+
+    class Meta:
+        verbose_name = _('Содержимое футера')
+        verbose_name_plural = _('Содержимое футера')
+
+    def __str__(self):
+        return f"Footer Content - {self.updated_at.strftime('%Y-%m-%d %H:%M')}"
+
+    def save(self, *args, **kwargs):
+        if not self.pk and FooterContent.objects.exists():
+            # If this is the first object and there are existing objects,
+            # don't create a new one
+            return
+        super().save(*args, **kwargs) 
+    
+
+
+
