@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-clo((7pbi=65e%3rl_+2rf)c2a_$=h25=w=dodgpoz8tc=^1yp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['kaz-info.kz', '104.248.252.49']
+ALLOWED_HOSTS = ['info-kaz.kz', '68.183.215.5']
 
 
 # Application definition
@@ -80,8 +80,12 @@ WSGI_APPLICATION = 'news_portal.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'kaz_info',
+        'USER': 'kaz_info_user',
+        'PASSWORD': 'your_secure_password',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
