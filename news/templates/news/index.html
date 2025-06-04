@@ -1,76 +1,137 @@
 {% extends 'news/base.html' %}
+{% load static %}
 
-{% block title %}INFO_KAZ - Главная{% endblock %}
+{% block title %}Главная - INFO_KAZ{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="card mb-4">
-            <div class="card-header bg-white">
-                <h2 class="mb-0">Последние новости</h2>
-            </div>
-            <div class="card-body">
-                {% if news_list %}
-                    {% for news in news_list %}
-                        <article class="card mb-4">
-                            <div class="row g-0">
-                                {% if news.image %}
-                                    <div class="col-md-4 card-img-top-container">
-                                        <a href="{% url 'news:news_detail' news.slug %}">
-                                            <img src="{{ news.image.url }}" class="img-fluid rounded-start" alt="{{ news.title }}">
-                                        </a>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h3 class="card-title h5">
-                                                <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
-                                                    {{ news.title }}
-                                                </a>
-                                            </h3>
-                                            <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
-                                            <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
-                                            <div class="d-flex align-items-center text-muted">
-                                                <i class="bi bi-folder me-2"></i>
-                                                <span class="me-3">{{ news.category.name }}</span>
-                                                <i class="bi bi-clock me-2"></i>
-                                                <small>{{ news.created_at|date:"d.m.Y H:i" }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% else %}
-                                    <div class="col-12">
-                                        <div class="card-body">
-                                            <h3 class="card-title h5">
-                                                <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
-                                                    {{ news.title }}
-                                                </a>
-                                            </h3>
-                                            <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
-                                            <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
-                                            <div class="d-flex align-items-center text-muted">
-                                                <i class="bi bi-folder me-2"></i>
-                                                <span class="me-3">{{ news.category.name }}</span>
-                                                <i class="bi bi-clock me-2"></i>
-                                                <small>{{ news.created_at|date:"d.m.Y H:i" }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                {% endif %}
+<style>
+    /* Стили для карточек новостей на главной */
+    .news-card {
+        border: 1px solid var(--border-color); /* Добавляем границу */
+        margin-bottom: 1.5rem;
+        background-color: white;
+        box-shadow: none; /* Убираем тень по умолчанию */
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .news-card:hover {
+        transform: translateY(-3px); /* Эффект при наведении */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .news-card .card-header {
+        background-color: var(--light-gray); /* Светлый фон для заголовка */
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.5rem;
+    }
+
+    .news-card .card-body {
+        padding: 1.5rem;
+    }
+
+    .news-card .news-title-link {
+        color: var(--primary-color);
+        text-decoration: none !important; /* Убираем подчеркивание */
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .news-card .news-title-link:hover {
+        color: var(--accent-color);
+        /* text-decoration: underline; */ /* Убираем подчеркивание при наведении */
+    }
+
+    .news-card .card-text.d-inline {
+         margin-right: .5rem;
+    }
+
+    .news-card .card-text + a.text-decoration-none {
+         font-weight: 500;
+         color: var(--secondary-color);
+         transition: color 0.3s ease;
+    }
+
+     .news-card .card-text + a.text-decoration-none:hover {
+         color: var(--accent-color);
+     }
+     /* Убираем подчеркивание у названия сайта в шапке */
+     .navbar-brand {
+        text-decoration: none !important;
+     }
+
+     .news-card .card-img-top-container img {
+        height: 200px; /* Фиксированная высота для изображений в одноколонке */
+        object-fit: cover; /* Обрезка изображения, если оно не соответствует пропорциям */
+     }
+
+</style>
+
+<h2 class="mb-4">Последние новости</h2>
+
+{% if news_list %}
+    <div class="row">
+        <div class="col-12">
+            {% for news in news_list %}
+                <article class="card news-card">
+                    <div class="row g-0">
+                        {% if news.image %}
+                            <div class="col-md-4 card-img-top-container">
+                                <a href="{% url 'news:news_detail' news.slug %}">
+                                    <img src="{{ news.image.url }}" class="img-fluid rounded-start" alt="{{ news.title }}">
+                                </a>
                             </div>
-                        </article>
-                    {% endfor %}
-                {% else %}
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle me-2"></i>
-                        {% if search_query %}
-                            По вашему запросу "{{ search_query }}" ничего не найдено.
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h3 class="card-title h5">
+                                        <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
+                                            {{ news.title }}
+                                        </a>
+                                    </h3>
+                                    <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none" style="white-space: nowrap; flex-shrink: 0;">Читать далее</a>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="bi bi-folder me-2"></i>
+                                            <span class="me-3">{{ news.category.name }}</span>
+                                            <i class="bi bi-clock me-2"></i>
+                                            <small class="me-3">{{ news.created_at|date:"d.m.Y H:i" }}</small>
+                                            <i class="bi bi-eye me-1"></i>
+                                            <small>{{ news.views_count }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {% else %}
-                            На данный момент новостей нет.
+                            <div class="col-12">
+                                <div class="card-body">
+                                    <h3 class="card-title h5">
+                                        <a href="{% url 'news:news_detail' news.slug %}" class="news-title-link">
+                                            {{ news.title }}
+                                        </a>
+                                    </h3>
+                                    <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none" style="white-space: nowrap; flex-shrink: 0;">Читать далее</a>
+                                        <div class="d-flex align-items-center text-muted">
+                                            <i class="bi bi-folder me-2"></i>
+                                            <span class="me-3">{{ news.category.name }}</span>
+                                            <i class="bi bi-clock me-2"></i>
+                                            <small class="me-3">{{ news.created_at|date:"d.m.Y H:i" }}</small>
+                                            <i class="bi bi-eye me-1"></i>
+                                            <small>{{ news.views_count }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
                     </div>
-                {% endif %}
-            </div>
+                </article>
+            {% endfor %}
         </div>
     </div>
-</div>
+{% else %}
+    <div class="alert alert-info">
+        Новостей пока нет.
+    </div>
+{% endif %}
 {% endblock %} 

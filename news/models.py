@@ -37,6 +37,8 @@ class News(models.Model):
     image = models.ImageField(upload_to='news_images/', verbose_name='Изображение', null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='news', verbose_name='Категория')
     is_published = models.BooleanField(default=False, verbose_name='Опубликовано')
+    is_deleted = models.BooleanField(default=False, verbose_name='Удалено')
+    views_count = models.IntegerField(default=0, verbose_name='Количество просмотров')
     slug = models.SlugField(max_length=200, unique=True, db_index=True, verbose_name='URL-слаг')
 
     class Meta:

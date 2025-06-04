@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.db.models import Q
+from django.db.models import Q, F
+from django.db.models.functions import Lower
 from datetime import datetime
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
@@ -9,6 +10,7 @@ from django.contrib.auth import login as auth_login
 from django.conf import settings
 from django import forms
 from django.contrib import messages
+from django.core.paginator import Paginator
 from .models import Category, News, Contact
 from .forms import ContactForm, NewsAdminForm, CategoryAdminForm
 
@@ -25,17 +27,21 @@ def get_categories():
 
 def index(request):
     search_query = request.GET.get('search', '')
-    news_list = News.objects.filter(is_published=True)
+    news_list = News.objects.filter(is_published=True, is_deleted=False).order_by('-created_at')
     
     if search_query:
+        # Convert search_query to lower case for case-insensitive comparison
+        search_query_lower = search_query.lower()
         news_list = news_list.filter(
-            Q(title__icontains=search_query) |
-            Q(content__icontains=search_query)
+            Q(title__icontains=search_query_lower) |
+            Q(content__icontains=search_query_lower)
         )
+    
+    news_list = news_list[:10] # Apply slice after filtering (or not filtering if search_query is empty)
     
     categories = Category.objects.all()
     context = {
-        'news_list': news_list,
+        'news_list': news_list, # Pass the news_list directly
         'categories': categories,
         'search_query': search_query,
     }
@@ -43,7 +49,7 @@ def index(request):
 
 def category_detail(request, category_slug):
     category = get_object_or_404(Category, slug=category_slug)
-    news_list = News.objects.filter(category=category, is_published=True)
+    news_list = News.objects.filter(category=category, is_published=True, is_deleted=False).order_by('-created_at') # Exclude deleted news
     
     search_query = request.GET.get('search', '')
     date_filter = request.GET.get('date_filter', '')
@@ -57,6 +63,11 @@ def category_detail(request, category_slug):
     if date_filter:
         news_list = news_list.filter(created_at__date=date_filter)
     
+    # Add pagination for category view
+    paginator = Paginator(news_list, 5) # Show 5 news per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     available_dates = News.objects.filter(
         category=category,
         is_published=True
@@ -65,7 +76,7 @@ def category_detail(request, category_slug):
     categories = Category.objects.all()
     context = {
         'category': category,
-        'news_list': news_list,
+        'page_obj': page_obj, # Pass the Page object
         'search_query': search_query,
         'date_filter': date_filter,
         'available_dates': available_dates,
@@ -74,13 +85,37 @@ def category_detail(request, category_slug):
     return render(request, 'news/category_detail.html', context)
 
 def news_detail(request, news_slug):
-    news = get_object_or_404(News, slug=news_slug, is_published=True)
+    # Allow preview of deleted news for admin users
+    if request.user.is_staff and request.GET.get('preview_deleted') == 'True':
+        news = get_object_or_404(News, slug=news_slug) # Get news regardless of published/deleted status
+    else:
+        news = get_object_or_404(News, slug=news_slug, is_published=True, is_deleted=False)
     
-    # Логика комментариев удалена
+    # Increment views count only for regular views, once per session
+    # Check if the 'viewed_news' list exists in the session, create if not
+    viewed_news_list = request.session.get('viewed_news', [])
+
+    # Check if the current news slug is in the viewed list
+    if not (request.user.is_staff and request.GET.get('preview_deleted') == 'True') and news.slug not in viewed_news_list:
+        news.views_count = F('views_count') + 1
+        news.save()
+        # Add the news slug to the viewed list in session
+        viewed_news_list.append(news.slug)
+        request.session['viewed_news'] = viewed_news_list
+        request.session.modified = True # Mark session as modified
+        
+        # Refresh the object from DB after incrementing F() expression
+        news.refresh_from_db()
     
+    # Get 5 random recommended news (excluding the current one)
+    recommended_news = News.objects.filter(
+        is_published=True # Consider all published news for randomness
+    ).exclude(slug=news_slug).order_by('?')[:5] # Get 5 random news
+
     categories = Category.objects.all()
     context = {
         'news': news,
+        'recommended_news': recommended_news, # Add recommended news to context
         'categories': categories,
     }
     return render(request, 'news/news_detail.html', context)
@@ -110,7 +145,7 @@ def contact_success(request):
 
 @staff_member_required
 def admin_news_list(request):
-    news_list = News.objects.all().order_by('-created_at')
+    news_list = News.objects.filter(is_deleted=False).order_by('-created_at') # Show only non-deleted news
     context = {
         'news_list': news_list,
         'categories': Category.objects.all(), # Для навигации
@@ -154,7 +189,9 @@ def admin_news_update(request, news_slug):
 def admin_news_delete(request, news_slug):
     news_item = get_object_or_404(News, slug=news_slug)
     if request.method == 'POST':
-        news_item.delete()
+        news_item.is_deleted = True # Mark as deleted instead of deleting
+        news_item.save() # Save the change
+        messages.success(request, f'Новость "{news_item.title}" перемещена в корзину.') # Add a success message
         return redirect(reverse('news:admin_news_list'))
     
     context = {
@@ -162,6 +199,27 @@ def admin_news_delete(request, news_slug):
         'categories': Category.objects.all(), # Для навигации
     }
     return render(request, 'news/admin/news_confirm_delete.html', context)
+
+@staff_member_required
+def admin_news_trash(request):
+    deleted_news = News.objects.filter(is_deleted=True).order_by('-created_at')
+    context = {
+        'deleted_news': deleted_news,
+        'categories': Category.objects.all(), # Для навигации админки
+    }
+    return render(request, 'news/admin/news_trash.html', context)
+
+@staff_member_required
+def admin_news_restore(request, news_slug):
+    news_item = get_object_or_404(News.objects.filter(is_deleted=True), slug=news_slug) # Get only deleted news
+    if request.method == 'POST':
+        news_item.is_deleted = False # Mark as not deleted
+        news_item.save()
+        messages.success(request, f'Новость "{news_item.title}" успешно восстановлена.')
+        return redirect(reverse('news:admin_news_trash')) # Redirect back to trash
+    # For GET request, maybe show a confirmation page? Or just handle POST?
+    # For simplicity, we'll just handle POST here, confirmation can be in template
+    return redirect(reverse('news:admin_news_trash')) # Redirect back to trash for GET
 
 # Custom Admin Views for Categories
 @staff_member_required
