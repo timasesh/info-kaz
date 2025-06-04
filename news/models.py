@@ -40,6 +40,7 @@ class News(models.Model):
     is_deleted = models.BooleanField(default=False, verbose_name='Удалено')
     views_count = models.IntegerField(default=0, verbose_name='Количество просмотров')
     slug = models.SlugField(max_length=200, unique=True, db_index=True, verbose_name='URL-слаг')
+    is_news_of_the_day = models.BooleanField(default=False, verbose_name='Новость дня')
 
     class Meta:
         verbose_name = 'Новость'

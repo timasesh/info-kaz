@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-clo((7pbi=65e%3rl_+2rf)c2a_$=h25=w=dodgpoz8tc=^1yp'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['kaz-info.kz', '104.248.252.49']
 
 
 # Application definition
@@ -131,5 +131,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Static files collection root
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-LOGIN_URL = 'news:admin_login' 
+
+LOGIN_URL = 'news:admin_login'
+
+# Security settings for production
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+X_FRAME_OPTIONS = 'DENY'
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Consider using environment variables for sensitive settings like SECRET_KEY
+# For example, using python-decouple:
+# from decouple import config
+# SECRET_KEY = config('SECRET_KEY') 

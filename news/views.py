@@ -27,7 +27,12 @@ def get_categories():
 
 def index(request):
     search_query = request.GET.get('search', '')
-    news_list = News.objects.filter(is_published=True, is_deleted=False).order_by('-created_at')
+    
+    # Get the News of the Day, exclude deleted
+    news_of_the_day = News.objects.filter(is_news_of_the_day=True, is_published=True, is_deleted=False).first()
+
+    # Get other news, exclude News of the Day and deleted
+    news_list = News.objects.filter(is_published=True, is_deleted=False).exclude(is_news_of_the_day=True).order_by('-created_at')
     
     if search_query:
         # Convert search_query to lower case for case-insensitive comparison
@@ -41,7 +46,8 @@ def index(request):
     
     categories = Category.objects.all()
     context = {
-        'news_list': news_list, # Pass the news_list directly
+        'news_of_the_day': news_of_the_day, # Pass News of the Day
+        'news_list': news_list, # Pass other news
         'categories': categories,
         'search_query': search_query,
     }
@@ -146,9 +152,23 @@ def contact_success(request):
 @staff_member_required
 def admin_news_list(request):
     news_list = News.objects.filter(is_deleted=False).order_by('-created_at') # Show only non-deleted news
+
+    # Apply category filter
+    category_slug = request.GET.get('category')
+    if category_slug:
+        news_list = news_list.filter(category__slug=category_slug)
+
+    # Apply search filter
+    search_query = request.GET.get('search')
+    if search_query:
+        news_list = news_list.filter(
+            Q(title__icontains=search_query) |
+            Q(content__icontains=search_query)
+        )
+
     context = {
         'news_list': news_list,
-        'categories': Category.objects.all(), # Для навигации
+        'categories': Category.objects.all(), # Для навигации и фильтра
     }
     return render(request, 'news/admin/news_list.html', context)
 
@@ -341,4 +361,53 @@ def admin_contact_mark_read(request, message_id):
         message.status = 'read'
         message.save()
         messages.success(request, 'Сообщение отмечено как прочитанное')
-    return redirect('news:admin_contact_detail', message_id=message.id) 
+    return redirect('news:admin_contact_detail', message_id=message.id)
+
+@staff_member_required
+def admin_dashboard(request):
+    # Get some statistics for the dashboard
+    total_news_count = News.objects.filter(is_deleted=False).count()
+    total_categories_count = Category.objects.count()
+    total_messages_count = Contact.objects.count()
+    unread_messages_count = Contact.objects.filter(status='new').count()
+    published_news_count = News.objects.filter(is_published=True, is_deleted=False).count()
+    deleted_news_count = News.objects.filter(is_deleted=True).count()
+
+    context = {
+        'total_news_count': total_news_count,
+        'total_categories_count': total_categories_count,
+        'total_messages_count': total_messages_count,
+        'unread_messages_count': unread_messages_count,
+        'published_news_count': published_news_count,
+        'deleted_news_count': deleted_news_count,
+        'categories': Category.objects.all(), # Для навигации админки
+    }
+    return render(request, 'news/admin/admin_dashboard.html', context)
+
+@staff_member_required
+def admin_news_of_the_day(request):
+    if request.method == 'POST':
+        news_slug = request.POST.get('news_slug')
+        if news_slug:
+            # Unset the previous News of the Day
+            News.objects.filter(is_news_of_the_day=True).update(is_news_of_the_day=False)
+            # Set the new News of the Day
+            news_item = get_object_or_404(News, slug=news_slug)
+            news_item.is_news_of_the_day = True
+            news_item.save()
+            messages.success(request, f'"{news_item.title}" назначена новостью дня.')
+        else:
+             # If no news_slug is provided in POST, it means we want to unset the current News of the Day
+            News.objects.filter(is_news_of_the_day=True).update(is_news_of_the_day=False)
+            messages.success(request, 'Новость дня снята.')
+        return redirect(reverse('news:admin_news_of_the_day'))
+
+    news_list = News.objects.filter(is_deleted=False).order_by('-created_at') # Show non-deleted news
+    current_news_of_the_day = News.objects.filter(is_news_of_the_day=True, is_deleted=False).first()
+
+    context = {
+        'news_list': news_list,
+        'current_news_of_the_day': current_news_of_the_day,
+        'categories': Category.objects.all(), # Для навигации админки
+    }
+    return render(request, 'news/admin/news_of_the_day.html', context) 

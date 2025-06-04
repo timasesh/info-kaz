@@ -1,5 +1,6 @@
 from django.urls import path, include
 from . import views
+from django.contrib.auth.views import LogoutView
 
 app_name = 'news'
 
@@ -7,20 +8,17 @@ app_name = 'news'
 ADMIN_URL_PREFIX = 'aadminkaa01news/' # <-- CHANGE THIS TO SOMETHING UNIQUE!
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('category/<slug:category_slug>/', views.category_detail, name='category_detail'),
-    path('contact/', views.contact, name='contact'),
-    path('contact/success/', views.contact_success, name='contact_success'),
-    path('<slug:news_slug>/', views.news_detail, name='news_detail'),
-
-    # Custom Admin URLs
+    # Custom Admin URLs (placed before generic slug patterns)
     path(f'{ADMIN_URL_PREFIX}login/', views.admin_login, name='admin_login'),
+    path(f'{ADMIN_URL_PREFIX}logout/', LogoutView.as_view(), name='admin_logout'), # Custom logout URL
+    path(f'{ADMIN_URL_PREFIX}', views.admin_dashboard, name='admin_dashboard'),
     path(f'{ADMIN_URL_PREFIX}news/', views.admin_news_list, name='admin_news_list'),
     path(f'{ADMIN_URL_PREFIX}news/create/', views.admin_news_create, name='admin_news_create'),
     path(f'{ADMIN_URL_PREFIX}news/<slug:news_slug>/edit/', views.admin_news_update, name='admin_news_update'),
     path(f'{ADMIN_URL_PREFIX}news/<slug:news_slug>/delete/', views.admin_news_delete, name='admin_news_delete'),
     path(f'{ADMIN_URL_PREFIX}news/trash/', views.admin_news_trash, name='admin_news_trash'),
     path(f'{ADMIN_URL_PREFIX}news/<slug:news_slug>/restore/', views.admin_news_restore, name='admin_news_restore'),
+    path(f'{ADMIN_URL_PREFIX}news/news-of-the-day/', views.admin_news_of_the_day, name='admin_news_of_the_day'),
 
     # Custom Admin URLs for Categories
     path(f'{ADMIN_URL_PREFIX}categories/', views.admin_category_list, name='admin_category_list'),
@@ -33,4 +31,12 @@ urlpatterns = [
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/', views.admin_contact_detail, name='admin_contact_detail'),
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/delete/', views.admin_contact_delete, name='admin_contact_delete'),
     path(f'{ADMIN_URL_PREFIX}contacts/<int:message_id>/mark-read/', views.admin_contact_mark_read, name='admin_contact_mark_read'),
+
+    # Public URLs
+    path('', views.index, name='index'),
+    path('category/<slug:category_slug>/', views.category_detail, name='category_detail'),
+    path('contact/', views.contact, name='contact'),
+    path('contact/success/', views.contact_success, name='contact_success'),
+    # This must be the last pattern to catch all other slugs
+    path('<slug:news_slug>/', views.news_detail, name='news_detail'),
 ] 
