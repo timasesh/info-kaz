@@ -188,3 +188,24 @@ AWS_S3_REGION_NAME = 'fra1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = 'public-read'  # Или 'private', если хочешь ограничить доступ
 AWS_QUERYSTRING_AUTH = False  # Отключает временные ссылки, делает URL постоянными
+
+SUMMERNOTE_CONFIG = {
+    # Required: URL to the Summernote Static files (e.g. '/static/summernote/')
+    # Often handled automatically by Django's staticfiles, but explicit is safer in some deployments
+    #'url': '/static/summernote/', # This is for static files, not upload URLs
+
+    # Set the base URL for Summernote's internal requests, including uploads
+    # This MUST match the URL where you included django_summernote.urls in your urls.py
+    'summernote': {
+        'url': f'/{ADMIN_URL_PREFIX}summernote/',
+        # ... other summernote JS settings (like toolbar, height, etc.) ...
+        # If you have existing settings inside 'summernote', they will be merged.
+    },
+
+    # Optional: set custom upload_to function or storage class if needed, 
+    # but for S3/Spaces, DEFAULT_FILE_STORAGE often handles this.
+    #'attachment_upload_to': my_custom_upload_to_func,
+    #'attachment_storage_class': 'my.custom.storage.class.name',
+
+    # ... other global SUMMERNOTE_CONFIG settings ...
+}
