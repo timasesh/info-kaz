@@ -35,6 +35,9 @@ urlpatterns = [
     # Custom Admin URL for Footer
     path(f'{ADMIN_URL_PREFIX}footer/', views.admin_footer_edit, name='admin_footer_edit'),
 
+    # Summernote URLs (must be under admin prefix)
+    path(f'{ADMIN_URL_PREFIX}summernote/', include('django_summernote.urls')),
+
     # Public URLs
     path('', views.index, name='index'),
     path('category/<slug:category_slug>/', views.category_detail, name='category_detail'),
