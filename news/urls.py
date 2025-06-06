@@ -10,7 +10,7 @@ ADMIN_URL_PREFIX = 'aadminkaa01news/' # <-- CHANGE THIS TO SOMETHING UNIQUE!
 urlpatterns = [
     # Custom Admin URLs (placed before generic slug patterns)
     path(f'{ADMIN_URL_PREFIX}login/', views.admin_login, name='admin_login'),
-    path(f'{ADMIN_URL_PREFIX}logout/', LogoutView.as_view(), name='admin_logout'), # Custom logout URL
+    path(f'{ADMIN_URL_PREFIX}logout/', LogoutView.as_view(next_page='news:admin_login'), name='admin_logout'), # Custom logout URL
     path(f'{ADMIN_URL_PREFIX}', views.admin_dashboard, name='admin_dashboard'),
     path(f'{ADMIN_URL_PREFIX}news/', views.admin_news_list, name='admin_news_list'),
     path(f'{ADMIN_URL_PREFIX}news/create/', views.admin_news_create, name='admin_news_create'),
