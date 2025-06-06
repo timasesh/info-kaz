@@ -1,0 +1,118 @@
+{% extends 'admin/change_form.html' %}
+
+{% load static %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM fully loaded. Attempting to find Summernote textarea.');
+
+            // Summernote обычно привязывается к textarea. 
+            // Попробуем найти textarea, возможно, по ID или классу, который Django/Summernote добавляет.
+            // Чаще всего ID формируется как 'id_' + имя_поля_модели.
+            // В вашем случае поле, скорее всего, называется 'body' или похоже.
+            var summernoteTextarea = document.querySelector('textarea#id_body'); // Предполагаемый ID
+            
+            // Если ID поля другой, нужно будет его уточнить.
+            // Можно также попробовать более общий селектор, если поле уникально на странице.
+            if (!summernoteTextarea) {
+                summernoteTextarea = document.querySelector('textarea[name="body"]'); // Попробуем по имени атрибута
+                 if (!summernoteTextarea) {
+                     console.log('Summernote textarea with ID or name \'body\' not found.');
+                     // Возможно, имя поля другое или селектор должен быть иным.
+                     // Оставьте console.log, чтобы проверить в браузере, какие textarea есть на странице.
+                     // document.querySelectorAll('textarea').forEach(ta => console.log(ta.id, ta.name));
+                     return;
+                 }
+            }
+
+            console.log('Summernote textarea found.', summernoteTextarea);
+
+            // Теперь, когда элемент textarea найден, попробуем передать ему опцию uploadUrl.
+            // В стандартном Summernote есть опции handleImageUpload.
+            // В django-summernote это может управляться иначе.
+            // Попробуем вызвать summernote method to set options, if available
+            try {
+                 $(summernoteTextarea).summernote('option', {
+                    // Это предположение. Возможно, опция для upload URL называется иначе.
+                    // Или нужно использовать колбэк onImageUpload.
+                    // uploadUrl: '/aadminkaa01news/summernote/upload_attachment/'
+
+                    // Более вероятный подход: использовать колбэк onImageUpload
+                    // Этот колбэк должен отправлять файл вручную на нужный URL
+                    callbacks: {
+                        onImageUpload: function(files) {
+                            // files - это массив File объектов
+                            // Обычно Summernote ожидает, что вы сами отправите AJAX запрос
+                            // и вставите изображение в редактор после успешной загрузки.
+                            console.log('onImageUpload callback triggered.', files);
+                            if (files.length > 0) {
+                                var file = files[0];
+                                var formData = new FormData();
+                                formData.append('files', file); // Имя поля для файла может отличаться, проверить в логах или доках
+                                
+                                // Добавляем CSRF токен
+                                var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                                $.ajax({
+                                    url: '/aadminkaa01news/summernote/upload_attachment/', // Правильный URL загрузки
+                                    method: 'POST',
+                                    data: formData,
+                                    processData: false, // Не обрабатывать данные FormData
+                                    contentType: false, // Не устанавливать тип контента
+                                    headers: {
+                                        'X-CSRFToken': csrftoken
+                                    },
+                                    success: function(response) {
+                                        console.log('Upload successful.', response);
+                                        // Вставляем изображение в редактор
+                                        // Ответ от сервера должен содержать URL загруженного изображения
+                                        // Summernote ожидает URL в определенном формате в ответе.
+                                        // Нужно проверить формат ответа от /aadminkaa01news/summernote/upload_attachment/
+
+                                        // Пример вставки (response.url - если сервер возвращает URL в поле url):
+                                        if (response.url) {
+                                             $(summernoteTextarea).summernote('insertImage', response.url);
+                                             console.log('Image inserted into editor.', response.url);
+                                        } else if (response[0] && response[0].url) { // Проверим формат ответа из предыдущих логов, там был массив
+                                             $(summernoteTextarea).summernote('insertImage', response[0].url);
+                                             console.log('Image inserted into editor (array response).', response[0].url);
+                                        } else {
+                                             console.error('Upload success, but no URL found in response.', response);
+                                        }
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Upload failed.', xhr.responseText);
+                                        alert('Ошибка при загрузке изображения: ' + xhr.responseText);
+                                    }
+                                });
+                            }
+                        }
+                    }
+                 });
+                 console.log('Summernote options (callbacks) set.');
+
+            } catch (e) {
+                console.error('Error setting Summernote options:', e);
+                console.log('Summernote object might not be initialized yet or method incorrect.');
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block field_sets %}
+    {{ block.super }}
+{% endblock %}
+
+{% block inline_field_sets %}
+    {{ block.super }}
+{% endblock %}
+
+{% block after_field_sets %}
+    {{ block.super }}
+{% endblock %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+{% endblock %} 
