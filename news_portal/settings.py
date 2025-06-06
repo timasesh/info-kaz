@@ -189,6 +189,7 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = 'public-read'  # Или 'private', если хочешь ограничить доступ
 AWS_QUERYSTRING_AUTH = False  # Отключает временные ссылки, делает URL постоянными
 
+from news.urls import ADMIN_URL_PREFIX
 SUMMERNOTE_CONFIG = {
     # Required: URL to the Summernote Static files (e.g. '/static/summernote/')
     # Often handled automatically by Django's staticfiles, but explicit is safer in some deployments
