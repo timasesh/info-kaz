@@ -172,15 +172,11 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # SECURE_BROWSER_XSS_FILTER = False
 # SECURE_CONTENT_TYPE_NOSNIFF = False
 
-# Consider using environment variables for sensitive settings like SECRET_KEY
-# For example, using python-decouple:
-# from decouple import config
-# SECRET_KEY = config('SECRET_KEY')
 # DigitalOcean Spaces (S3-compatible) Storage
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = 'DO006R8WWV8NUCFUU2QL'
-AWS_SECRET_ACCESS_KEY = 'WD/84vU15H41QOORMYw9xMAuehXYCfbZ9l61az2YDdg'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'info-kaz'
 AWS_S3_ENDPOINT_URL = 'https://fra1.digitaloceanspaces.com'
 AWS_S3_REGION_NAME = 'fra1'
