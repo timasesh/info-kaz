@@ -176,15 +176,15 @@ X_FRAME_OPTIONS = 'SAMEORIGIN'
 # For example, using python-decouple:
 # from decouple import config
 # SECRET_KEY = config('SECRET_KEY')
-
-# DigitalOcean Spaces settings
+# DigitalOcean Spaces (S3-compatible) Storage
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME') # Используйте переменную окружения для имени бакета
-AWS_S3_ENDPOINT_URL = os.environ.get('AWS_S3_ENDPOINT_URL') # Используйте переменную окружения для URL эндпоинта (например, https://nyc3.digitaloceanspaces.com)
+AWS_ACCESS_KEY_ID = 'DO006R8WWV8NUCFUU2QL'
+AWS_SECRET_ACCESS_KEY = 'WD/84vU15H41QOORMYw9xMAuehXYCfbZ9l61az2YDdg'
+AWS_STORAGE_BUCKET_NAME = 'info-kaz'
+AWS_S3_ENDPOINT_URL = 'https://fra1.digitaloceanspaces.com'
+AWS_S3_REGION_NAME = 'fra1'
+
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read' # Или private, в зависимости от ваших требований к доступу
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME') # Добавьте регион бакета (например, nyc3)
+AWS_DEFAULT_ACL = 'public-read'  # Или 'private', если хочешь ограничить доступ
+AWS_QUERYSTRING_AUTH = False  # Отключает временные ссылки, делает URL постоянными
