@@ -23,6 +23,7 @@ class NewsAdminForm(forms.ModelForm):
             'category': forms.Select(attrs={'class': 'form-select'}),
             'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'is_published': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class CategoryAdminForm(forms.ModelForm):
@@ -32,4 +33,4 @@ class CategoryAdminForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'slug': forms.TextInput(attrs={'class': 'form-control'}),
-        } 
+        }
