@@ -150,8 +150,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Media files
-MEDIA_URL = '/media/'
+
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Static files collection root
@@ -206,3 +205,7 @@ SUMMERNOTE_CONFIG = {
 
     # ... other global SUMMERNOTE_CONFIG settings ...
 }
+
+AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN', f'{AWS_STORAGE_BUCKET_NAME}.fra1.digitaloceanspaces.com')
+
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
