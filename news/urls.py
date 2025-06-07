@@ -5,7 +5,7 @@ from django.contrib.auth.views import LogoutView
 app_name = 'news'
 
 # Choose a secret prefix for the admin panel URLs
-ADMIN_URL_PREFIX = 'aadminkaa01news/' # <-- CHANGE THIS TO SOMETHING UNIQUE!
+from news_portal.config import ADMIN_URL_PREFIX
 
 urlpatterns = [
     # Custom Admin URLs (placed before generic slug patterns)
