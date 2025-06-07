@@ -181,7 +181,9 @@ AWS_S3_REGION_NAME = 'fra1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = 'public-read'  # Или 'private', если хочешь ограничить доступ
 AWS_QUERYSTRING_AUTH = False  # Отключает временные ссылки, делает URL постоянными
-
+AWS_S3_OBJECT_PARAMETERS = {
+    'ACL': 'public-read',
+}
 from news_portal.config import ADMIN_URL_PREFIX
 SUMMERNOTE_CONFIG = {
     # Required: URL to the Summernote Static files (e.g. '/static/summernote/')
