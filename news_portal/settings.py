@@ -163,14 +163,17 @@ LOGIN_URL = 'news:admin_login'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+# X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = 'ALLOWALL'
+
 
 # You might keep these as False unless you have a specific reason to enable them.
 # SECURE_BROWSER_XSS_FILTER = False
 # SECURE_CONTENT_TYPE_NOSNIFF = False
 
 # DigitalOcean Spaces (S3-compatible) Storage
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
@@ -185,28 +188,28 @@ AWS_S3_OBJECT_PARAMETERS = {
     'ACL': 'public-read',
 }
 from news_portal.config import ADMIN_URL_PREFIX
-SUMMERNOTE_CONFIG = {
-    # Required: URL to the Summernote Static files (e.g. '/static/summernote/')
-    # Often handled automatically by Django's staticfiles, but explicit is safer in some deployments
-    #'url': '/static/summernote/', # This is for static files, not upload URLs
 
-    # Set the base URL for Summernote's internal requests, including uploads
-    # This MUST match the URL where you included django_summernote.urls in your urls.py
+
+SUMMERNOTE_CONFIG = {
+    'attachment_storage_class': 'storages.backends.s3boto3.S3Boto3Storage',
+    'attachment_filesize_limit': 1024 * 1024 * 10,  # 10MB
+    'summernote': {
+        'width': '100%',
+        'height': '480',
+    },
     'summernote': {
         'url': f'/{ADMIN_URL_PREFIX}summernote/',
         # ... other summernote JS settings (like toolbar, height, etc.) ...
         # If you have existing settings inside 'summernote', they will be merged.
     },
-
-    # Optional: set custom upload_to function or storage class if needed, 
-    # but for S3/Spaces, DEFAULT_FILE_STORAGE often handles this.
-    #'attachment_upload_to': my_custom_upload_to_func,
-    #'attachment_storage_class': 'my.custom.storage.class.name',
-
-    # ... other global SUMMERNOTE_CONFIG settings ...
 }
 
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN', f'{AWS_STORAGE_BUCKET_NAME}.fra1.digitaloceanspaces.com')
 
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
+
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
