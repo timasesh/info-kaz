@@ -208,3 +208,4 @@ SUMMERNOTE_CONFIG = {
 AWS_S3_CUSTOM_DOMAIN = os.environ.get('AWS_S3_CUSTOM_DOMAIN', f'{AWS_STORAGE_BUCKET_NAME}.fra1.digitaloceanspaces.com')
 
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
