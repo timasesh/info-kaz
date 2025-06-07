@@ -187,11 +187,17 @@ def admin_news_list(request):
 @staff_member_required
 def admin_news_create(request):
     if request.method == 'POST':
+        print("POST received")
+        print("FILES:", request.FILES)
         form = NewsAdminForm(request.POST, request.FILES)
         if form.is_valid():
+            print("Form is valid")
             news_item = form.save()
+            print("News saved:", news_item)
+            print("News image:", news_item.image)
             return redirect(reverse('news:admin_news_list'))
     else:
+        print("Form errors:", form.errors)
         form = NewsAdminForm()
     
     context = {
