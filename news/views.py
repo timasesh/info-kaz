@@ -197,8 +197,8 @@ def admin_news_create(request):
             print("News image:", news_item.image)
             return redirect(reverse('news:admin_news_list'))
     else:
-        print("Form errors:", form.errors)
         form = NewsAdminForm()
+        print("Form errors:", form.errors)
     
     context = {
         'form': form,
