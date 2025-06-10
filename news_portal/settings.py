@@ -129,9 +129,7 @@ SUMMERNOTE_CONFIG = {
         ],
     },
     'disable_attachment': False,
-    'url': {
-        'upload_attachment': f'/{ADMIN_URL_PREFIX}summernote/upload_attachment/',
-    }
+    # 'url': { ... }  # УБРАТЬ этот ключ!
 }
 
 # Logging Configuration
