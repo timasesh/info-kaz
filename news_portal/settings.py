@@ -73,7 +73,7 @@ WSGI_APPLICATION = 'news_portal.wsgi.application'
 # База данных
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgres://mysite:password@localhost/mysite',
+        default='postgres://doadmin:PASSWORD@db-postgresql-nyc1-33365-do-user-23013683-0.g.db.ondigitalocean.com:25060/defaultdb',
         conn_max_age=600
     )
 }
