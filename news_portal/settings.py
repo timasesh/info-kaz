@@ -16,7 +16,7 @@ ALLOWED_HOSTS = [
     '.onrender.com',
     'info-kaz.kz',
     'www.info-kaz.kz',
-    'oyster-app-m7ei6.ondigitalocean.app',
+    'info-kaz-app-wsool.ondigitalocean.app',
 ]
 
 # Приложения
