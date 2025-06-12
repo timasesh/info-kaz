@@ -18,7 +18,7 @@ ALLOWED_HOSTS = [
     'www.info-kaz.kz',
     'info-kaz-app-wsool.ondigitalocean.app',
 ]
-
+A = 123131
 # Приложения
 INSTALLED_APPS = [
     'django.contrib.admin',
