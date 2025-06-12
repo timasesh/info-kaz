@@ -10,15 +10,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# ALLOWED_HOSTS = [
-#     'localhost',
-#     '127.0.0.1',
-#     '.onrender.com',
-#     'info-kaz.kz',
-#     'www.info-kaz.kz',
-#     'info-kaz-app-wsool.ondigitalocean.app',
-# ]
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '.onrender.com',
+    'info-kaz.kz',
+    'www.info-kaz.kz',
+    'info-kaz-app-wsool.ondigitalocean.app',
+]
 A = 123131
 # Приложения
 INSTALLED_APPS = [

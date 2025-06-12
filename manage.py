@@ -3,6 +3,8 @@
 import os
 import sys
 
+import sys
+print("\n".join(sys.path))
 
 def main():
     """Run administrative tasks."""
