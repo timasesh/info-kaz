@@ -3,10 +3,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
 
-# Загрузка переменных окружения
 load_dotenv()
-
-print(os.environ)  # Для отладки (можно удалить в проде)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,7 +17,6 @@ ALLOWED_HOSTS = [
     'info-kaz.kz',
     'www.info-kaz.kz',
     'oyster-app-m7ei6.ondigitalocean.app',
-    os.environ.get('AWS_STORAGE_BUCKET_NAME', 'info-kaz-1') + '.fra1.digitaloceanspaces.com',
 ]
 
 # Приложения
@@ -36,7 +32,6 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
-    'storages',
 ]
 
 SITE_ID = 1
@@ -102,38 +97,17 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Медиа и хранилище
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME', 'info-kaz-1')
-AWS_S3_ENDPOINT_URL = 'https://fra1.digitaloceanspaces.com'
-AWS_S3_REGION_NAME = 'fra1'
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.fra1.digitaloceanspaces.com'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = 'public-read'
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_OBJECT_PARAMETERS = {
-    'CacheControl': 'max-age=86400',
-    'ACL': 'public-read'
-}
+# Медиа — локальное хранилище для изображений/видео
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+# Файловое хранилище
+DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
-# Логин
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-LOGIN_URL = 'news:admin_login'
-
-# Безопасность
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-SECURE_SSL_REDIRECT = True
-X_FRAME_OPTIONS = 'ALLOWALL'
-
-# Настройка Summernote
+# Summernote — локальное хранилище
 from news_portal.config import ADMIN_URL_PREFIX
 SUMMERNOTE_CONFIG = {
-    'attachment_storage_class': 'storages.backends.s3boto3.S3Boto3Storage',
+    'attachment_storage_class': 'django.core.files.storage.FileSystemStorage',
     'attachment_filesize_limit': 10 * 1024 * 1024,  # 10MB
     'summernote': {
         'width': '100%',
@@ -149,6 +123,16 @@ SUMMERNOTE_CONFIG = {
     'disable_attachment': False,
 }
 
+# Логин
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = 'news:admin_login'
+
+# Безопасность
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+X_FRAME_OPTIONS = 'ALLOWALL'
+
 # Логирование
 LOGGING = {
     'version': 1,
@@ -163,6 +147,3 @@ LOGGING = {
         'level': 'DEBUG' if DEBUG else 'INFO',
     },
 }
-
-# Вывод имени бакета для отладки
-print("BUCKET NAME:", AWS_STORAGE_BUCKET_NAME)
