@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Секретный ключ и дебаг-режим из переменных окружения
 SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'False'
 
 # Разрешенные хосты
 ALLOWED_HOSTS = [
@@ -77,7 +77,7 @@ import dj_database_url
 import os
 # Настройки базы данных через переменные окружения
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
+    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
 }
 
 # Валидация паролей
