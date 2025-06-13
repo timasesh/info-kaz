@@ -73,14 +73,11 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'news_portal.wsgi.application'
-
+import dj_database_url
+import os
 # Настройки базы данных через переменные окружения
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 }
 
 # Валидация паролей
