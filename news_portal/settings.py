@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
+    'news'
 ]
 
 SITE_ID = 1
