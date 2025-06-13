@@ -5,7 +5,6 @@
 
 {% block content %}
 <style>
-    /* Убираем подчеркивание у ссылок на новости */
     .news-title-link {
         text-decoration: none !important;
     }
@@ -14,18 +13,19 @@
         text-decoration: none;
     }
 
-     /* Убираем подчеркивание у названия сайта в шапке */
-     .navbar-brand {
+    .navbar-brand {
         text-decoration: none !important;
-     }
-
+    }
 </style>
 
 <div class="row">
     <div class="col-12">
+
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{% url 'news:index' %}" class="text-decoration-none">Главная</a></li>
+                <li class="breadcrumb-item">
+                    <a href="{% url 'news:index' %}" class="text-decoration-none">Главная</a>
+                </li>
                 <li class="breadcrumb-item active" aria-current="page">{{ category.name }}</li>
             </ol>
         </nav>
@@ -77,15 +77,16 @@
                     </p>
                 {% endif %}
             </div>
+
             <div class="card-body">
                 {% if page_obj.object_list %}
                     {% for news in page_obj.object_list %}
                         <article class="card mb-4">
                             <div class="row g-0">
                                 {% if news.image %}
-                                    <div class="col-md-4 card-img-top-container">
+                                    <div class="col-md-4 text-center">
                                         <a href="{% url 'news:news_detail' news.slug %}">
-                                            <img src="{{ news.image.url }}" class="img-fluid rounded-start" alt="{{ news.title }}">
+                                            <img src="{{ news.image.url }}" class="img-fluid rounded-start" alt="{{ news.title }}" style="max-height: 250px; object-fit: cover;">
                                         </a>
                                     </div>
                                     <div class="col-md-8">
@@ -97,7 +98,7 @@
                                             </h3>
                                             <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
                                             <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
-                                            <div class="d-flex align-items-center text-muted">
+                                            <div class="d-flex align-items-center text-muted mt-2">
                                                 <i class="bi bi-clock me-2"></i>
                                                 <small class="me-3">{{ news.created_at|date:"d.m.Y H:i" }}</small>
                                                 <i class="bi bi-eye me-1"></i>
@@ -115,7 +116,7 @@
                                             </h3>
                                             <p class="card-text d-inline">{{ news.content|safe|truncatewords:30 }}</p>
                                             <a href="{% url 'news:news_detail' news.slug %}" class="text-decoration-none">Читать далее</a>
-                                            <div class="d-flex align-items-center text-muted">
+                                            <div class="d-flex align-items-center text-muted mt-2">
                                                 <i class="bi bi-clock me-2"></i>
                                                 <small class="me-3">{{ news.created_at|date:"d.m.Y H:i" }}</small>
                                                 <i class="bi bi-eye me-1"></i>
@@ -128,25 +129,26 @@
                         </article>
                     {% endfor %}
 
-                    {# Pagination controls #}
                     {% if page_obj.has_other_pages %}
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination justify-content-center">
-                            {% if page_obj.has_previous %}
-                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">Предыдущая</a></li>
-                            {% endif %}
-
-                            {% for i in page_obj.paginator.page_range %}
-                                <li class="page-item {% if page_obj.number == i %}active{% endif %}">
-                                    <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">{{ i }}</a>
-                                </li>
-                            {% endfor %}
-
-                            {% if page_obj.has_next %}
-                                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">Следующая</a></li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                {% if page_obj.has_previous %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">Предыдущая</a>
+                                    </li>
+                                {% endif %}
+                                {% for i in page_obj.paginator.page_range %}
+                                    <li class="page-item {% if page_obj.number == i %}active{% endif %}">
+                                        <a class="page-link" href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">{{ i }}</a>
+                                    </li>
+                                {% endfor %}
+                                {% if page_obj.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if date_filter %}&date_filter={{ date_filter }}{% endif %}">Следующая</a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
                     {% endif %}
 
                 {% else %}
@@ -163,4 +165,4 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
