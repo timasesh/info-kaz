@@ -31,11 +31,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'news.apps.NewsConfig',
     'django_summernote',
     'django.contrib.sites',
     'django.contrib.flatpages',
     'whitenoise.runserver_nostatic',
-    'news'
 ]
 
 SITE_ID = 1
