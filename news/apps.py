@@ -1,7 +1,10 @@
 from django.apps import AppConfig
-import os
+
+
 class NewsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'news'
-    path = os.path.dirname(os.path.abspath(__file__))
-    verbose_name = 'Новостной портал' 
+    path = '/news_portal/news'  # Укажите точный путь к директории приложения
+
+# Указанный путь к приложению корректный, так как он соответствует структуре вашего проекта,
+# где основная директория проекта и директория с manage.py называются "news_portal".
