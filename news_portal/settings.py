@@ -9,9 +9,9 @@ load_dotenv()
 # Основная директория проекта
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Секретный ключ и дебаг-режим из переменных окружения
-SECRET_KEY = os.environ.get('SECRET_KEY')
-DEBUG = os.environ.get('DEBUG', 'False') == 'False'
+# Секретный ключ и дебаг-режим
+SECRET_KEY = os.environ.get('SECRET_KEY', 'unsafe-secret-key')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Разрешенные хосты
 ALLOWED_HOSTS = [
@@ -73,11 +73,14 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'news_portal.wsgi.application'
-import dj_database_url
-import os
-# Настройки базы данных через переменные окружения
+
+# Настройки базы данных
 DATABASES = {
-    'default': dj_database_url.config(conn_max_age=600, ssl_require=True)
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+        conn_max_age=600,
+        ssl_require=True
+    )
 }
 
 # Валидация паролей
@@ -99,17 +102,14 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Медиа-файлы
+# Медиа
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Файловое хранилище
-DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-# Конфигурация Summernote
+# Summernote конфигурация
 SUMMERNOTE_CONFIG = {
     'attachment_storage_class': 'django.core.files.storage.FileSystemStorage',
-    'attachment_filesize_limit': 10 * 1024 * 1024,  # 10MB
+    'attachment_filesize_limit': 10 * 1024 * 1024,
     'summernote': {
         'width': '100%',
         'height': '480',
@@ -124,7 +124,7 @@ SUMMERNOTE_CONFIG = {
     'disable_attachment': False,
 }
 
-# Логин
+# Авторизация
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'news:admin_login'
 
@@ -148,3 +148,4 @@ LOGGING = {
         'level': 'DEBUG' if DEBUG else 'INFO',
     },
 }
+a = 'test'
