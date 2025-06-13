@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'news_portal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+        'NAME': 'defaultdb',
+        'USER': 'doadmin',
+        'PASSWORD': 'AVNS_sR4UHh2qaolIE52MfdM',
+        'HOST': 'info-kaz-1-do-user-23013683-0.g.db.ondigitalocean.com',
+        'PORT': '25060',
         'OPTIONS': {
             'sslmode': 'require',
         },
